@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MyTestMCPServer\MyTestMCPServer.csproj" />
     <ProjectReference Include="..\NTG.Agent.Admin\NTG.Agent.Admin\NTG.Agent.Admin.csproj" />
     <ProjectReference Include="..\NTG.Agent.Orchestrator\NTG.Agent.Orchestrator.csproj" />
     <ProjectReference Include="..\NTG.Agent.ServiceDefaults\NTG.Agent.ServiceDefaults.csproj" />

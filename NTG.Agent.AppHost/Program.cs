@@ -1,6 +1,10 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var orchestrator = builder.AddProject<Projects.NTG_Agent_Orchestrator>("ntg-agent-orchestrator");
+var myTestMCPServer = builder.AddProject<Projects.MyTestMCPServer>("mytestmcpserver");
+
+var orchestrator = builder.AddProject<Projects.NTG_Agent_Orchestrator>("ntg-agent-orchestrator")
+    .WithReference(myTestMCPServer)
+    .WaitFor(myTestMCPServer);
 
 builder.AddProject<Projects.NTG_Agent_WebClient>("ntg-agent-webclient")
     .WithExternalHttpEndpoints()

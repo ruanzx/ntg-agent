@@ -1,4 +1,6 @@
 using Microsoft.SemanticKernel;
+using ModelContextProtocol.Authentication;
+using ModelContextProtocol.Client;
 using NTG.Agent.Orchestrator.Agents;
 using NTG.Agent.Orchestrator.Plugins;
 using OpenAI;
@@ -13,6 +15,20 @@ builder.AddServiceDefaults();
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+await using IMcpClient mcpClient = await McpClientFactory.CreateAsync(
+    new SseClientTransport(new()
+    {
+        Name = "MyTestMCP",
+        Endpoint = new Uri("http://localhost:5051")
+    })
+);
+
+var tools = await mcpClient.ListToolsAsync();
+foreach (var tool in tools)
+{
+    Console.WriteLine($"Tool: {tool.Name} - {tool.Description}");
+}
 
 builder.Services.AddSingleton<Kernel>(serviceBuilder => { 
     var config = serviceBuilder.GetRequiredService<IConfiguration>();
@@ -41,6 +57,10 @@ builder.Services.AddSingleton<Kernel>(serviceBuilder => {
     }
     
     var kernel = kernelBuilder.Build();
+
+#pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+    kernel.Plugins.AddFromFunctions("MyTestMCP", tools.Select(x => x.AsKernelFunction()));
+#pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
     kernel.Plugins.Add(KernelPluginFactory.CreateFromType<DateTimePlugin>());
 
